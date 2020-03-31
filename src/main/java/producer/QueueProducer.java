@@ -1,4 +1,4 @@
-package rabbit;
+package producer;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,8 +11,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class QueueProducer {
 
-    @Value("${fanout.exchange}")
-    private String fanoutExchange;
+    @Value("${exchange.name}")
+    private String exchangeName;
+    @Value("${routing.key}")
+    private String routingKey;
 
     private final RabbitTemplate rabbitTemplate;
 
@@ -26,9 +28,8 @@ public class QueueProducer {
     private ObjectMapper objectMapper;
 
     public void produce(Transaction transaction) throws Exception {
-        System.out.println("Storing notification...");
-        rabbitTemplate.setExchange(fanoutExchange);
-        rabbitTemplate.convertAndSend(objectMapper.writeValueAsString(transaction));
-        System.out.println("Notification stored in queue successfully");
+        System.out.println("Storing message in queue...");
+        rabbitTemplate.convertAndSend(exchangeName, routingKey, objectMapper.writeValueAsString(transaction));
+        System.out.println("Message stored in queue successfully.");
     }
 }

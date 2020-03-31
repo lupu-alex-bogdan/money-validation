@@ -8,12 +8,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitConfig {
-    @Value("${fanout.exchange}")
-    private String fanoutExchange;
+    @Value("${exchange.name}")
+    private String exchangeName;
     @Value("${queue.name}")
     private String queueName;
-    @Value("${fanout.exchange.dlx}")
-    private String fanoutExchangeDlx;
+    @Value("${exchange.name.dlx}")
+    private String exchangeNameDlx;
     @Value("${queue.name.dlx}")
     private String queueNameDlx;
     @Value("${routing.key.dlx}")
@@ -24,37 +24,38 @@ public class RabbitConfig {
     @Bean(name = "queueName")
     Queue queue() {
         return QueueBuilder.durable(queueName)
-                .deadLetterExchange(fanoutExchangeDlx)
+                .deadLetterExchange(exchangeNameDlx)
                 .deadLetterRoutingKey(routingKeyDlx)
-                .ttl(1000)
+                .ttl(15000)
                 .build();
     }
 
     @Bean(name = "queueNameDlx")
     Queue queueDlx() {
         return QueueBuilder.durable(queueNameDlx)
-//                .deadLetterRoutingKey(queueName)
-//                .ttl(1000)
+                .deadLetterExchange(exchangeName)
+                .deadLetterRoutingKey(queueName)
+                .ttl(15000)
                 .build();
     }
 
-    @Bean(name = "fanoutExchange")
-    FanoutExchange exchange() {
-        return new FanoutExchange(fanoutExchange);
+    @Bean(name = "exchange")
+    Exchange exchange() {
+        return new DirectExchange(exchangeName);
     }
 
-    @Bean(name = "fanoutExchangeDlx")
-    FanoutExchange exchangeDlx() {
-        return new FanoutExchange(fanoutExchangeDlx);
+    @Bean(name = "exchangeDlx")
+    Exchange exchangeDlx() {
+        return new DirectExchange(exchangeNameDlx);
     }
 
     @Bean(name = "binding")
-    Binding binding(@Qualifier("queueName") Queue queue, @Qualifier("fanoutExchange") Exchange exchange) {
+    Binding binding(@Qualifier("queueName") Queue queue, @Qualifier("exchange") Exchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with(routingKey).noargs();
     }
 
     @Bean(name = "bindingDlx")
-    Binding deadLetterBind(@Qualifier("queueNameDlx") Queue queue, @Qualifier("fanoutExchangeDlx") Exchange exchange) {
+    Binding deadLetterBind(@Qualifier("queueNameDlx") Queue queue, @Qualifier("exchangeDlx") Exchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with(routingKeyDlx).noargs();
     }
 }

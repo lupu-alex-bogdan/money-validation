@@ -4,7 +4,7 @@ import model.Transaction;
 import org.iban4j.IbanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import rabbit.QueueProducer;
+import producer.QueueProducer;
 import util.CnpUtil;
 
 @Service

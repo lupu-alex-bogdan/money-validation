@@ -1,11 +1,10 @@
 package app;
 
 import config.SwaggerConfig;
-import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import rabbit.QueueProducer;
+import producer.QueueProducer;
 import resource.TransactionValidationResource;
 import service.TransactionValidationService;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
